@@ -24,11 +24,11 @@
             createPDF().catch(err => console.log(err));
 
             async function createPDF() {
-                let fileInput = file.files[0];
+                const fileInput = file.files[0];
                 const origPdfBytes = fileInput ? await fileInput.arrayBuffer()
                     : await fetch('dummy.pdf').then((res) => res.arrayBuffer())
 
-                let pngImageBytes = await blob.arrayBuffer()
+                const pngImageBytes = await blob.arrayBuffer()
                 const { PDFDocument } = PDFLib
                 const pdfDoc = await PDFDocument.load(origPdfBytes)
                 const pngImage = await pdfDoc.embedPng(pngImageBytes)
