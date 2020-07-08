@@ -1,0 +1,48 @@
+<html>
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@2.3.2/dist/signature_pad.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.js"></script>
+    <script src="https://unpkg.com/downloadjs@1.4.7"></script>
+</head>
+<body style="background-color: darkgray">
+<canvas width="600" height="400" style="background-color: white">
+
+</canvas>
+<div>
+    <button onclick="downloadBtn()">Download</button>
+</div>
+<script>
+    var canvas = document.querySelector('canvas');
+    var signaturePad = new SignaturePad(canvas);
+
+    function downloadBtn() {
+        canvas.toBlob(function(blob){
+            createPDF().catch(err => console.log(err));
+
+            async function createPDF() {
+                let pngImageBytes = await blob.arrayBuffer();
+                const { PDFDocument } = PDFLib
+                const pdfDoc = await PDFDocument.create()
+                const pngImage = await pdfDoc.embedPng(pngImageBytes)
+
+                const pngDims = pngImage.scale(0.5)
+
+                const page = pdfDoc.addPage()
+
+                page.drawImage(pngImage, {
+                    x: page.getWidth() / 2 - pngDims.width / 2,
+                    y: page.getHeight() / 2 - pngDims.height / 2,
+                    width: pngDims.width,
+                    height: pngDims.height,
+                })
+
+                const pdfBytes = await pdfDoc.save()
+
+                // Trigger the browser to download the PDF document
+                download(pdfBytes, "signature.pdf", "application/pdf");
+            }
+        }, 'image/png')
+    }
+</script>
+</body>
+</html>
