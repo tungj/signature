@@ -12,15 +12,13 @@
 </div>
 <script>
     var canvas = document.querySelector('canvas');
-    var signaturePad = new SignaturePad(canvas, {
-        backgroundColor: 'rgb(255, 255, 255)'
-    });
+    var signaturePad = new SignaturePad(canvas);
 
     function download() {
-        var imgData = signaturePad.toDataURL('image/jpeg', 1.0);
+        var imgData = signaturePad.toDataURL('image/png', 1.0);
         var pdf = new jsPDF();
 
-        pdf.addImage(imgData, 'JPEG', 0, 0);
+        pdf.addImage(imgData, 'PNG', 0, 0);
         pdf.save('signature.pdf');
     }
 </script>
