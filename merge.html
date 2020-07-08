@@ -11,16 +11,22 @@
 <div>
     <button onclick="downloadBtn()">Download</button>
 </div>
+<div>
+    Background file <input id="file" type="file">
+</div>
 <script>
     var canvas = document.querySelector('canvas');
     var signaturePad = new SignaturePad(canvas);
+    var file = document.querySelector('input[type=file]')
 
     function downloadBtn() {
         canvas.toBlob(function(blob){
             createPDF().catch(err => console.log(err));
 
             async function createPDF() {
-                const origPdfBytes = await fetch('dummy.pdf').then((res) => res.arrayBuffer())
+                let fileInput = file.files[0];
+                const origPdfBytes = fileInput ? await fileInput.arrayBuffer()
+                    : await fetch('dummy.pdf').then((res) => res.arrayBuffer())
 
                 let pngImageBytes = await blob.arrayBuffer()
                 const { PDFDocument } = PDFLib
