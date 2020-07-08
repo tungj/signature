@@ -20,15 +20,16 @@
             createPDF().catch(err => console.log(err));
 
             async function createPDF() {
-                let pngImageBytes = await blob.arrayBuffer();
+                const origPdfBytes = await fetch('dummy.pdf').then((res) => res.arrayBuffer())
+
+                let pngImageBytes = await blob.arrayBuffer()
                 const { PDFDocument } = PDFLib
-                const pdfDoc = await PDFDocument.create()
+                const pdfDoc = await PDFDocument.load(origPdfBytes)
                 const pngImage = await pdfDoc.embedPng(pngImageBytes)
+                const pngDims = pngImage.scale(1)
+                const page = pdfDoc.getPages()[0]
 
-                const pngDims = pngImage.scale(0.5)
-
-                const page = pdfDoc.addPage()
-
+                // Center signature
                 page.drawImage(pngImage, {
                     x: page.getWidth() / 2 - pngDims.width / 2,
                     y: page.getHeight() / 2 - pngDims.height / 2,
