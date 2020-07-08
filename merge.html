@@ -25,8 +25,8 @@
 
             async function createPDF() {
                 const fileInput = file.files[0];
-                const origPdfBytes = fileInput ? await fileInput.arrayBuffer()
-                    : await fetch('dummy.pdf').then((res) => res.arrayBuffer())
+                const origPdfBytes = await (fileInput ? fileInput.arrayBuffer()
+                    : fetch('dummy.pdf').then((res) => res.arrayBuffer()))
 
                 const pngImageBytes = await blob.arrayBuffer()
                 const { PDFDocument } = PDFLib
