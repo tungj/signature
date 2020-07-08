@@ -1,0 +1,28 @@
+<html>
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@2.3.2/dist/signature_pad.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.1/jspdf.debug.js" integrity="sha256-wyNUwH3AO+4yHnbp67NfXy2dQmpe6P+8XT7YXcZhdE0=" crossorigin="anonymous"></script>
+</head>
+<body style="background-color: darkgray">
+<canvas width="600" height="400" style="background-color: white">
+
+</canvas>
+<div>
+    <button onclick="download()">Download</button>
+</div>
+<script>
+    var canvas = document.querySelector('canvas');
+    var signaturePad = new SignaturePad(canvas, {
+        backgroundColor: 'rgb(255, 255, 255)'
+    });
+
+    function download() {
+        var imgData = signaturePad.toDataURL('image/jpeg', 1.0);
+        var pdf = new jsPDF();
+
+        pdf.addImage(imgData, 'JPEG', 0, 0);
+        pdf.save('signature.pdf');
+    }
+</script>
+</body>
+</html>
