@@ -1,0 +1,73 @@
+<html>
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/formiojs@latest/dist/formio.full.min.css">
+    <script src="https://unpkg.com/formiojs@latest/dist/formio.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.js"></script>
+    <script src="https://unpkg.com/downloadjs@1.4.7"></script>
+</head>
+<body>
+<div id="formio"></div>
+<script type="text/javascript">
+    window.onload = async function() {
+        const form = await Formio.createForm(document.getElementById('formio'), {
+            components: [
+                {
+                    label: "Signature",
+                    backgroundColor: "rgba(245,245,235,0)",
+                    tableView: false,
+                    key: "signature",
+                    type: "signature",
+                    input: true
+                }, {
+                    attrs: [{attr: "type", value: "file"}],
+                    input: false,
+                    key: "rawFileInput",
+                    label: "RawFileInput",
+                    refreshOnChange: false,
+                    tableView: false,
+                    tag: "input",
+                    type: "htmlelement"
+                }, {
+                    type: 'button',
+                    action: 'submit',
+                    label: 'Submit',
+                    theme: 'primary'
+                }
+            ]
+        });
+
+        form.on('submit', async submission => {
+            const components = form.getComponents();
+            const signatureCmp = components.find(cmp => cmp.type === 'signature');
+            const rawFileInput = components.find(cmp => cmp.type === 'htmlelement');
+
+            const image = signatureCmp.signaturePad.toDataURL('image/png');
+
+            const fileInput = rawFileInput.element.getElementsByTagName('input')[0].files[0];
+            const origPdfBytes = await (fileInput ? fileInput.arrayBuffer()
+                : fetch('dummy.pdf').then((res) => res.arrayBuffer()))
+
+            const { PDFDocument } = PDFLib
+            const pdfDoc = await PDFDocument.load(origPdfBytes)
+            const pngImage = await pdfDoc.embedPng(image)
+            const pngDims = pngImage.scale(1)
+            const page = pdfDoc.getPages()[0]
+
+            // Center signature
+            page.drawImage(pngImage, {
+                x: page.getWidth() / 2 - pngDims.width / 2,
+                y: page.getHeight() / 2 - pngDims.height / 2,
+                width: pngDims.width,
+                height: pngDims.height,
+            })
+
+            const pdfBytes = await pdfDoc.save()
+
+            // Trigger the browser to download the PDF document
+            download(pdfBytes, "signature.pdf", "application/pdf");
+        })
+    };
+</script>
+</body>
+</html>
