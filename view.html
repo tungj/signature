@@ -1,0 +1,45 @@
+<html>
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.4.456/build/pdf.min.js"></script>
+    <style>
+        .page {
+            margin: 10px;
+            border: 1px solid black;
+            display: block;
+            max-width: 80%;
+        }
+    </style>
+</head>
+<body>
+<div id="pages"></div>
+<script>
+    const $pages = document.getElementById('pages');
+    drawPages();
+
+    async function drawPages() {
+        // const pdfdata = await fetch('jaspertest.pdf');
+        const pdf = await pdfjsLib.getDocument('jaspertest.pdf').promise;
+
+        for (let ii = 1; ii <= pdf.numPages; ++ii) {
+            const page = await pdf.getPage(ii)
+            const scale = 1.5;
+            const viewport = page.getViewport({ scale: scale, });
+
+            const canvas = document.createElement('canvas');
+            canvas.className = 'page'
+            $pages.appendChild(canvas);
+            const context = canvas.getContext('2d');
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+
+            const renderContext = {
+                canvasContext: context,
+                viewport: viewport
+            };
+            page.render(renderContext);
+        }
+        // debugger;
+    }
+</script>
+</body>
+</html>
